@@ -5,6 +5,7 @@ import requests
 import gspread
 from datetime import datetime
 from google.oauth2.service_account import Credentials
+from google.auth import default
 
 load_dotenv()
 
@@ -77,7 +78,11 @@ def filter_match_data(puuid, matchData):
     return filteredMatchData
 
 def get_sheets():
-    creds = Credentials.from_service_account_file("credentials.json", scopes=SCOPES)
+    # creds = Credentials.from_service_account_file("credentials.json", scopes=SCOPES)
+
+    creds, _ = default(scopes=SCOPES)
+    # service = build("sheets", "v4", credentials=creds)
+
     client = gspread.authorize(creds)
     workbook = client.open_by_key(SPREADSHEET_ID)
     return workbook
@@ -136,6 +141,7 @@ NAMES = {
 def main(name):
     matches = get_player_matches(NAMES[name], 6, 420)
     if matches:
+        print(matches)
         matches.reverse()
     last = get_last_cell_date(NAMES[name])
     if last == None:
@@ -160,6 +166,11 @@ def run_http(request):
         name = 'World'
 
     if name == "Emil" or name == "Erste" or name == "Ollie":
+        print("____________________________________")
+        print(RIOT_API)
         main(name)
+
+    if name == "Check":
+        name = RIOT_API
 
     return 'Hello {}!'.format(name)
