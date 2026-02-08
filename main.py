@@ -1,4 +1,5 @@
 import os
+import functions_framework
 from dotenv import load_dotenv
 import requests
 import gspread
@@ -145,3 +146,20 @@ def main(name):
             continue
         filteredData = filter_match_data(NAMES[name], data)
         write_data_to_sheet(NAMES[name], filteredData)
+
+@functions_framework.http
+def run_http(request):
+    request_json = request.get_json(silent=True)
+    request_args = request.args
+
+    if request_json and "name" in request_json:
+        name = request_json["name"]
+    elif request_args and "name" in request_args:
+        name = request_args["name"]
+    else:
+        name = 'World'
+
+    if name == "Emil" or name == "Erste" or name == "Ollie":
+        main(name)
+
+    return 'Hello {}!'.format(name)
